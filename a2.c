@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <time.h>
@@ -25,8 +26,9 @@ SharedData data = {0, -1, -1, 0};
 sem_t data_sem;     /* Semaphore for data access    */
 sem_t count_sem;    /* Semaphore for reader count   */
 int readers_count = 0;
+pthread_t threads[MAX_THREADS]; /* Array of thread IDs */
+int ids[MAX_THREADS];           /* Array of numerical IDs */
 
-//---------------------------------------------------------------80-Char-Limit-|
 
 /**
  * @brief   Handles error messages.
@@ -34,7 +36,7 @@ int readers_count = 0;
  * @param   msg The error message to be displayed.
  */
 void handle_error(const char* msg) {
-    perror(msg);
+    fprintf(stderr, "%s\n", msg);
     exit(EXIT_FAILURE);
 }
 
@@ -118,14 +120,37 @@ void* reader(void* arg) {
 }
 
 /**
+ * @brief   Create threads of a specific type.
+ * 
+ * @param   start_index The starting index in the threads and ids arrays.
+ * @param   num_threads Number of threads to create.
+ * @param   thread_type Function pointer to the thread's main function.
+ * @param   error_msg Error message to print if thread creation fails.
+ * 
+ * @return  The new index after all threads are created.
+ */
+int create_threads( int start_index, 
+                    int num_threads, 
+                    void *(*thread_type)(void *), 
+                    const char *error_msg) {
+    for (int i = 0; i < num_threads; i++) {
+        ids[start_index + i] = i;
+        if (pthread_create(&threads[start_index + i], 
+            NULL, thread_type, &ids[start_index + i])) {
+            handle_error(error_msg);
+        }
+    }
+    return start_index + num_threads;
+}
+
+/**
  * @brief   Main function to create threads and print the final state.
  * 
  * @return  Does not return a value; instead, exits with status 
  *          `EXIT_SUCCESS` to indicate successful execution.
  */
 int main() {
-    pthread_t threads[MAX_THREADS]; /* Array of thread IDs */
-    int ids[MAX_THREADS];           /* Array of numerical IDs */
+    int count = 0; /* count of threads created so far */
 
     /* Seed random number generator with current time */
     srand(time(NULL));
@@ -143,36 +168,22 @@ int main() {
     int num_decrementers = rand() % (MAX_THREADS / 2) + 1;
     int num_readers = MAX_THREADS - (num_incrementers + num_decrementers);
 
-    /* Create incrementer threads */
-    for (int i = 0; i < num_incrementers; i++) {
-        ids[i] = i;
-        if (pthread_create(&threads[i], NULL, incrementer, &ids[i])) {
-            handle_error("Error creating incrementer thread");
-        }
-    }
-
-    /* Create decrementer threads */
-    for (int i = 0; i < num_decrementers; i++) {
-        ids[num_incrementers + i] = i;
-        if (pthread_create(&threads[num_incrementers + i],
-            NULL,decrementer, &ids[num_incrementers + i])) {
-            handle_error("Error creating decrementer thread");
-        }
-    }
-
-    /* Create reader threads */
-    for (int i = 0; i < num_readers; i++) {
-        ids[num_incrementers + num_decrementers + i] = i;
-        if (pthread_create(&threads[num_incrementers + num_decrementers + i],
-            NULL, reader, &ids[num_incrementers + num_decrementers + i])) {
-            handle_error("Error creating reader thread");
-        }
-    }
+    /* Create threads */
+    count = create_threads(count, num_incrementers, incrementer, 
+                            "Error creating incrementer thread");
+    count = create_threads(count, num_decrementers, decrementer, 
+                            "Error creating decrementer thread");
+    count = create_threads(count, num_readers, reader, 
+                            "Error creating reader thread");
 
     /* Join all threads */
-    for (int i = 0; i < MAX_THREADS; i++) {
-        if (pthread_join(threads[i], NULL)) {
-            handle_error("Error joining thread");
+    for (int i = 0; i < count; i++) {  // Use 'count' here
+        int err = pthread_join(threads[i], NULL);
+        if (err != 0) {
+            char buf[256];
+            snprintf(buf, sizeof(buf), "Error joining thread: %s", 
+                        strerror(err));
+            handle_error(buf);
         }
     }
 
