@@ -1,7 +1,7 @@
 /**
  * @file    shared_data.h
  * @author  Kieran Hillier
- * @date    August 14, 2023
+ * @date    August 15, 2023
  * @version 0.1
  * 
  * @brief   Header file defining the SharedData structure.
@@ -11,7 +11,6 @@
  *          multiple threads in the readers-writers problem.
  */
 
-/* include guard */
 #ifndef SHARED_DATA_H
 #define SHARED_DATA_H
 
@@ -23,4 +22,10 @@ typedef struct {
     int num_writers;       /* Total number of writer threads */
 } SharedData;
 
-#endif /* end include guard */
+SharedData* init_shared_data();
+SharedData* get_shared_data();
+int read_shared_data(SharedData* data);
+void modify_shared_data(SharedData* data, int increment, int thread_id);
+void destroy_shared_data();
+
+#endif /* SHARED_DATA_H */

@@ -1,9 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -pedantic -pthread
 
-DEPS = 	
-
-OBJ = a2.o
+DEPS = common.h shared_data.h thread_operations.h utilities.h
+OBJ = a2.o shared_data.o thread_operations.o utilities.o
 
 all: a2
 
