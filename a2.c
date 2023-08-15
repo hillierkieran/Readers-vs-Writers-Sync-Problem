@@ -24,7 +24,6 @@ sem_t count_sem;                    /* Semaphore for reader count           */
 pthread_t threads[MAX_THREADS];     /* Array of thread IDs                  */
 int ids[MAX_THREADS];               /* Array of numerical IDs               */
 
-
 /**
  * @brief   Prints final state of the program.
  * 
