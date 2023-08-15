@@ -16,13 +16,16 @@
 #include "shared_data.h"
 #include "thread_operations.h"
 
-#define MAX_THREADS 10
-
 int readers_count = 0;              /* Count of threads currently reading   */
 sem_t data_sem;                     /* Semaphore for data access            */
-sem_t count_sem;                    /* Semaphore for reader count           */
+sem_t reader_sem;                   /* Semaphore for reader count           */
 pthread_t threads[MAX_THREADS];     /* Array of thread IDs                  */
 int ids[MAX_THREADS];               /* Array of numerical IDs               */
+
+typedef void* (*ThreadFuncPtr)(void *);
+ThreadFuncPtr functionArray[NUM_FUNC] = {incrementer, decrementer, reader};
+char* nameArray[NUM_FUNC] = {"incrementer", "decrementer", "reader"};
+
 
 /**
  * @brief   Prints final state of the program.
@@ -70,7 +73,7 @@ int main()
     if(sem_init(&data_sem, 0, 1) != 0) {
         handle_error("Error initializing data semaphore");
     }
-    if(sem_init(&count_sem, 0, 1) != 0) {
+    if(sem_init(&reader_sem, 0, 1) != 0) {
         handle_error("Error initializing count semaphore");
     }
 
@@ -80,12 +83,19 @@ int main()
     num_readers = MAX_THREADS - (num_incrementers + num_decrementers);
 
     /* Create threads */
-    count = create_threads(threads, ids, count, num_incrementers, incrementer, 
+    count = create_threads(threads, count, num_incrementers, incrementer,
                             "Error creating incrementer thread");
-    count = create_threads(threads, ids, count, num_decrementers, decrementer, 
+    count = create_threads(threads, count, num_decrementers, decrementer,
                             "Error creating decrementer thread");
-    count = create_threads(threads, ids, count, num_readers, reader, 
+    count = create_threads(threads, count, num_readers, reader,
                             "Error creating reader thread");
+    /*char errorMsg[MAX_STRING];
+    for (int i = 0; i < NUM_FUNC; i++) {
+        snprintf(errorMsg, sizeof(errorMsg), 
+                "Error creating %s thread", nameArray[i]);
+        count = create_threads(threads, count, num_incrementers, 
+                            functionArray[i], errorMsg);
+    }*/
 
     /* Join all threads */
     join_threads(threads, count);
@@ -98,7 +108,7 @@ int main()
 
     /* Destroy the semaphores */
     sem_destroy(&data_sem);
-    sem_destroy(&count_sem);
+    sem_destroy(&reader_sem);
 
     exit(EXIT_SUCCESS);
 }

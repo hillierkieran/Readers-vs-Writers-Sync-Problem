@@ -24,7 +24,7 @@ typedef struct {
 
 SharedData* init_shared_data();
 SharedData* get_shared_data();
-int read_shared_data(SharedData* data);
+int read_shared_data();
 void modify_shared_data(int increment, int thread_id);
 void destroy_shared_data();
 
