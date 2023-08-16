@@ -20,7 +20,8 @@
 #include <semaphore.h>
 #include <time.h>
 
-#define MAX_THREADS 10
+#define DEFAULT_THREADS 10
+#define MINIMUM_THREADS 3
 #define MAX_STRING 100
 #define NUM_FUNC 3
 #define READ_OP 0

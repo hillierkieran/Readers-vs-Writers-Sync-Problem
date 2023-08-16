@@ -15,13 +15,12 @@
 #include <pthread.h>
 #include "shared_data.h"
 
-void* shared_data_operation(void* arg, int increment);
 void* incrementer(void* arg);
 void* decrementer(void* arg);
 void* reader(void* arg);
-int create_threads(pthread_t threads[], int start_index, 
-                   int num_threads, void *(*thread_type)(void *), 
-                   const char *error_msg);
+int create_threads( pthread_t threads[], int max_threads, int start_index, 
+                    int num_threads, void *(*thread_type)(void *), 
+                    const char *error_msg);
 void join_threads(pthread_t threads[], int count);
 
 #endif /* THREAD_OPERATIONS_H */

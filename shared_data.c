@@ -15,25 +15,23 @@
 #include "shared_data.h"
 
 static SharedData* global_data = NULL;
-static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t internal_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 SharedData* init_shared_data()
 {
-    pthread_mutex_lock(&data_mutex);
+    mutex_lock(&internal_mutex);
 
+    global_data = malloc(sizeof(SharedData));
     if (!global_data) {
-        global_data = malloc(sizeof(SharedData));
-        if (!global_data) {
-            handle_error("Error allocating memory for shared data");
-        }
-        
-        global_data->sum = 0;
-        global_data->last_incr_id = -1;
-        global_data->last_decr_id = -1;
-        global_data->num_writers = 0;
+        handle_error("Error allocating memory for shared data");
     }
+    
+    global_data->sum = 0;
+    global_data->last_incr_id = -1;
+    global_data->last_decr_id = -1;
+    global_data->num_writers = 0;
 
-    pthread_mutex_unlock(&data_mutex);
+    mutex_unlock(&internal_mutex);
     return global_data;
 }
 
@@ -49,10 +47,10 @@ int read_shared_data()
 
 void modify_shared_data(int increment, int thread_id)
 {
-    pthread_mutex_lock(&data_mutex);
+    mutex_lock(&internal_mutex);
 
     if (!global_data) {
-        pthread_mutex_unlock(&data_mutex);
+        mutex_unlock(&internal_mutex);
         handle_error("Shared data not initialized");
     }
 
@@ -64,18 +62,18 @@ void modify_shared_data(int increment, int thread_id)
     }
     global_data->num_writers++;
 
-    pthread_mutex_unlock(&data_mutex);
+    mutex_unlock(&internal_mutex);
 }
 
 void destroy_shared_data()
 {
-    pthread_mutex_lock(&data_mutex);
+    mutex_lock(&internal_mutex);
 
     if (global_data) {
         free(global_data);
         global_data = NULL;
     }
 
-    pthread_mutex_unlock(&data_mutex);
-    pthread_mutex_destroy(&data_mutex);
+    mutex_unlock(&internal_mutex);
+    pthread_mutex_destroy(&internal_mutex);
 }

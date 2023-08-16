@@ -10,17 +10,34 @@
  */
 
 #include "common.h"
+#include "resources.h"
 #include "utilities.h"
 #include "shared_data.h"
 
-extern sem_t data_sem;      /* Semaphore for data access    */
-extern sem_t reader_sem;     /* Semaphore for reader count   */
+void mutex_lock(pthread_mutex_t *mutex)
+{
+    pthread_mutex_lock(mutex);
+}
+
+void mutex_unlock(pthread_mutex_t *mutex)
+{
+    pthread_mutex_unlock(mutex);
+}
+
+void sem_lock(sem_t *semaphore)
+{
+    sem_wait(semaphore);
+}
+
+void sem_unlock(sem_t *semaphore)
+{
+    sem_post(semaphore);
+}
 
 void cleanup()
 {
+    destroy_resources();
     destroy_shared_data();
-    sem_destroy(&data_sem);
-    sem_destroy(&reader_sem);
 }
 
 void handle_error(const char* msg)

@@ -12,6 +12,10 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+void mutex_lock(pthread_mutex_t *mutex);
+void mutex_unlock(pthread_mutex_t *mutex);
+void sem_lock(sem_t *semaphore);
+void sem_unlock(sem_t *semaphore);
 void cleanup();
 void handle_error(const char* msg);
 
