@@ -4,11 +4,12 @@
  * @date    August 16, 2023
  * @version 1.0
  *
- * @brief   Main file for readers-writers problem with incrementers, decrementers.
+ * @brief   Main file for readers-writers problem.
  * 
- * @details This program creates threads using POSIX. Incrementers and decrementers 
- *          modify a sum, while readers read its value. This file handles the main 
- *          program flow, from argument parsing to thread creation and reporting.
+ * @details This program creates threads using POSIX. Incrementers and 
+ *          decrementers modify a sum, while readers read its value. This file 
+ *          handles the main program flow, from argument parsing to thread 
+ *          creation and reporting.
  */
 
 #include "arg_parser.h"
@@ -52,9 +53,10 @@ void print_result(int num_incrementers,int num_decrementers, int num_readers)
 /**
  * @brief   Main program entry point.
  * 
- * @details Manages program flow: argument parsing, initialization, thread creation,
- *          joining, and cleanup. Begins by parsing arguments, initializing resources
- *          and data, creating threads, waiting for them to finish, and cleanup.
+ * @details Manages program flow: argument parsing, initialization, thread
+ *          creation, joining, and cleanup. Begins by parsing arguments,
+ *          initializing resources and data, creating threads, waiting for
+ *          them to finish, and cleanup.
  * 
  * @param   argc Number of command line arguments.
  * @param   argv Array of command line arguments.

@@ -26,8 +26,8 @@
 typedef struct {
     pthread_t* threads;
     int readers_count;
-    sem_t data_sem;                     /* Semaphore for data access            */
-    sem_t reader_sem;                   /* Semaphore for reader count           */
+    sem_t data_sem;
+    sem_t reader_sem;
     int sem_initialised;
 } Resources;
 

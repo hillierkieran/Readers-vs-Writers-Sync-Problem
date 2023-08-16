@@ -6,9 +6,9 @@
  *
  * @brief   Provides parsing of command line arguments.
  * 
- * @details This file implements the function to parse the command line arguments 
- *          for the program. It checks argument validity and sets the number of threads 
- *          to be used.
+ * @details This file implements the function to parse the command line
+ *          arguments for the program. It checks argument validity and sets 
+ *          the number of threads to be used.
  */
 
 #include <dirent.h>
