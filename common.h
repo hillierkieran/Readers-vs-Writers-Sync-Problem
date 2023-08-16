@@ -1,13 +1,13 @@
 /**
  * @file    common.h
  * @author  Kieran Hillier
- * @date    August 15, 2023
- * @version 0.1
+ * @date    August 16, 2023
+ * @version 1.0
+ *
+ * @brief   Common includes and defines for the project.
  * 
- * @brief   Header file with common includes and defines for the project.
- * 
- * @details This file includes necessary headers for the project and defines 
- *          common constants.
+ * @details This header includes necessary system headers and defines constants 
+ *          commonly used across multiple files in the project.
  */
 
 #ifndef COMMON_H

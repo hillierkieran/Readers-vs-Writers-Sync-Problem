@@ -1,14 +1,14 @@
 /**
  * @file    a2.c
  * @author  Kieran Hillier
- * @date    August 15, 2023
- * @version 0.1
+ * @date    August 16, 2023
+ * @version 1.0
+ *
+ * @brief   Main file for readers-writers problem with incrementers, decrementers.
  * 
- * @brief   A program to demonstrate readers and writers synchronization.
- * 
- * @details A multi-threaded program that creates a random number of 
- *          incrementer, decrementer, and reader threads. Shared data 
- *          is protected using POSIX semaphores.
+ * @details This program creates threads using POSIX. Incrementers and decrementers 
+ *          modify a sum, while readers read its value. This file handles the main 
+ *          program flow, from argument parsing to thread creation and reporting.
  */
 
 #include "arg_parser.h"
@@ -19,17 +19,25 @@
 #include "thread_operations.h"
 
 /**
- * @brief   Prints final state of the program.
+ * @brief   Prints final state of the shared data and thread counts.
  * 
- * @param   num_incrementers number of incrementer threads.
- * @param   num_decrementers number of decrementer threads.
- * @param   num_readers number of reader threads.
+ * @details Accesses shared data and prints its state, including the number of 
+ *          reader, incrementer, and decrementer threads created.
+ * 
+ * @param   num_incrementers Total incrementer threads.
+ * @param   num_decrementers Total decrementer threads.
+ * @param   num_readers Total reader threads.
  */
 void print_result(int num_incrementers,int num_decrementers, int num_readers)
 {
+    /* Access the shared data */
     SharedData *data = get_shared_data();
+
+    /* Print out the thread information. */
     printf("There were %d readers, %d incrementers and %d decrementers\n",
             num_readers, num_incrementers, num_decrementers);
+
+    /* Display the final state of the shared data. */
     printf("The final state of the data is:\n"
             "\tlast incrementer %d\n"
             "\tlast decrementer %d\n"
@@ -42,10 +50,16 @@ void print_result(int num_incrementers,int num_decrementers, int num_readers)
 }
 
 /**
- * @brief   Main function to create threads and print the final state.
+ * @brief   Main program entry point.
  * 
- * @return  Does not return a value; instead, exits with status 
- *          `EXIT_SUCCESS` to indicate successful execution.
+ * @details Manages program flow: argument parsing, initialization, thread creation,
+ *          joining, and cleanup. Begins by parsing arguments, initializing resources
+ *          and data, creating threads, waiting for them to finish, and cleanup.
+ * 
+ * @param   argc Number of command line arguments.
+ * @param   argv Array of command line arguments.
+ * 
+ * @return  Exits with `EXIT_SUCCESS` on success. 
  */
 int main(int argc, char *argv[])
 {
@@ -55,27 +69,27 @@ int main(int argc, char *argv[])
     int num_readers;            /* Number of reader threads.                */
     int count = 0;              /* Count of all threads created so far      */
 
-    /* Parse arguments */
+    /* Parse user-provided arguments. */
     parse_args(argc, argv, &max_threads);
 
-    /* Initialise resources */
+    /* Initialize necessary resources. */
     Resources* rsc = init_resources();
 
-    /* Allocate memory for the threads */
+    /* Allocate memory space for the threads. */
     alloc_threads(max_threads);
 
-    /* Initialise shared_data */
+    /* Initialize the shared data structure. */
     init_shared_data();
 
-    /* Seed random number generator with current time */
+    /* Seed the random number generator. */
     srand(time(NULL));
 
-    /* Randomly decide number of threads to be created */
+    /* Randomly decide the number of threads for each type. */
     num_incrementers = rand() % (max_threads / 2) + 1;
     num_decrementers = rand() % (max_threads / 2) + 1;
     num_readers = max_threads - (num_incrementers + num_decrementers);
 
-    /* Create threads */
+    /* Create threads for incrementers, decrementers, and readers. */
     count = create_threads(rsc->threads, max_threads, count, num_incrementers,
                             incrementer, "incrementer");
     count = create_threads(rsc->threads, max_threads, count, num_decrementers,
@@ -83,13 +97,15 @@ int main(int argc, char *argv[])
     count = create_threads(rsc->threads, max_threads, count, num_readers,
                             reader, "reader");
 
-    /* Join all threads */
+    /* Wait for all the threads to finish execution. */
     join_threads(rsc->threads, count);
 
-    /* Print the final state */
+    /* Display the final state of the system. */
     print_result(num_incrementers, num_decrementers, num_readers);
 
-    /* Destroy resources */
+    /* Clean up allocated resources and exit. */
     cleanup();
     exit(EXIT_SUCCESS);
-}
+} 
+
+/* end a2.c */
